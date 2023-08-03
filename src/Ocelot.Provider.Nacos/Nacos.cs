@@ -6,8 +6,8 @@ using Ocelot.ServiceDiscovery.Providers;
 using Ocelot.Values;
 using Nacos.V2;
 using Microsoft.Extensions.Options;
-using Ocelot.Provider.Nacos.NacosClient.V2;
 using NacosConstants = Nacos.V2.Common.Constants;
+using Ocelot.Provider.Nacos.NacosClient.V2;
 
 namespace Ocelot.Provider.Nacos
 {

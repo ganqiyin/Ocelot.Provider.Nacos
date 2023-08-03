@@ -5,15 +5,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nacos.V2;
 using Nacos.V2.Naming.Core;
-using Nacos.V2.Naming.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NacosInstance = Nacos.V2.Naming.Dtos.Instance;
 
 namespace Ocelot.Provider.Nacos.NacosClient.V2
 {
-    public class RegSvcBgTask
+    public class RegSvcBgTask : IHostedService, IDisposable
     {
         private static readonly string MetadataNetVersion = "DOTNET_VERSION";
         private static readonly string MetadataHostOs = "HOST_OS";
@@ -38,7 +38,12 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
             _features = server.Features;
         }
 
-        public async Task StartAsync()
+        public void Dispose()
+        {
+            Console.WriteLine("Dispose");
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             if (!_options.RegisterEnabled)
             {
@@ -71,7 +76,7 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
                 {
                     try
                     {
-                        var instance = new Instance
+                        var instance = new NacosInstance
                         {
                             Ephemeral = _options.Ephemeral,
                             ServiceName = _options.ServiceName,
@@ -87,7 +92,7 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
 
                         _logger.LogInformation("register instance to nacos server, 【{0}】", instance);
 
-                        await _svc.RegisterInstance(_options.ServiceName, _options.GroupName, instance);
+                        await _svc.RegisterInstance(_options.ServiceName, _options.GroupName, instance).ConfigureAwait(false);
                         break;
                     }
                     catch (Exception ex)
@@ -98,7 +103,7 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
             }
         }
 
-        public async Task StopAsync()
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             if (_options.RegisterEnabled)
             {
@@ -111,7 +116,7 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
                         try
                         {
                             _logger.LogWarning("begin to remove instance");
-                            await _svc.DeregisterInstance(_options.ServiceName, _options.GroupName, uri.Host, uri.Port, _options.ClusterName);
+                            await _svc.DeregisterInstance(_options.ServiceName, _options.GroupName, uri.Host, uri.Port, _options.ClusterName).ConfigureAwait(false);
                             _logger.LogWarning("removed instance");
                             break;
                         }

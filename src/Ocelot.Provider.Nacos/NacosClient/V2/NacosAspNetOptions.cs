@@ -1,9 +1,9 @@
-﻿using Nacos.V2;
-using Nacos.V2.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using NacosConstants = Nacos.V2.Common.Constants;
+using NacosSdkOptions = Nacos.V2.NacosSdkOptions;
 
 namespace Ocelot.Provider.Nacos.NacosClient.V2
-{
+{ 
     public class NacosAspNetOptions : NacosSdkOptions
     {
         /// <summary>
@@ -14,13 +14,13 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
         /// <summary>
         /// the name of the group.
         /// </summary>
-        public string GroupName { get; set; } = Constants.DEFAULT_GROUP;
+        public string GroupName { get; set; } = NacosConstants.DEFAULT_GROUP;
 
         /// <summary>
         /// the name of the cluster.
         /// </summary>
         /// <value>The name of the cluster.</value>
-        public string ClusterName { get; set; } = Constants.DEFAULT_CLUSTER_NAME;
+        public string ClusterName { get; set; } = NacosConstants.DEFAULT_CLUSTER_NAME;
 
         /// <summary>
         /// the ip of this instance

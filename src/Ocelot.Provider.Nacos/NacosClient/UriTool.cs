@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Http.Features;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Http.Features;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using NacosException = Nacos.V2.Exceptions.NacosException;
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Nacos.AspNetCore.Tests")]
 namespace Ocelot.Provider.Nacos.NacosClient
 {
     internal static class UriTool
@@ -56,7 +59,17 @@ namespace Ocelot.Provider.Nacos.NacosClient
             {
                 var url = ReplaceAddress(address, preferredNetworks);
 
-                return url.Split(splitChars).Select(x => new Uri(x));
+                var uris = url.Split(splitChars).Select(x => new Uri(x));
+
+                foreach (var item in uris)
+                {
+                    if (!IPAddress.TryParse(item.Host, out _))
+                    {
+                        throw new NacosException("Invalid ip address from ASPNETCORE_URLS");
+                    }
+                }
+
+                return uris;
             }
 
             // 4. --urls
@@ -71,7 +84,17 @@ namespace Ocelot.Provider.Nacos.NacosClient
 
                     var url = ReplaceAddress(address, preferredNetworks);
 
-                    return url.Split(splitChars).Select(x => new Uri(x));
+                    var uris = url.Split(splitChars).Select(x => new Uri(x));
+
+                    foreach (var item in uris)
+                    {
+                        if (!IPAddress.TryParse(item.Host, out _))
+                        {
+                            throw new NacosException("Invalid ip address from --urls");
+                        }
+                    }
+
+                    return uris;
                 }
             }
 
@@ -142,4 +165,3 @@ namespace Ocelot.Provider.Nacos.NacosClient
         }
     }
 }
-

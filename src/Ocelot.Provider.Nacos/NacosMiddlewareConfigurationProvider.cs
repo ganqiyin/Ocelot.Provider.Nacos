@@ -20,7 +20,7 @@ namespace Ocelot.Provider.Nacos
 
             if (UsingNacosServiceDiscoveryProvider(config.Data))
             {
-                builder.UseNacosAspNet(hostLifetime).GetAwaiter().GetResult();
+                builder.UseNacosAspNet(hostLifetime, default).GetAwaiter().GetResult();
             }
 
             return Task.CompletedTask;

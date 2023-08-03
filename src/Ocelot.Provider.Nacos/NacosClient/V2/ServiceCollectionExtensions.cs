@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nacos.V2.DependencyInjection;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ocelot.Provider.Nacos.NacosClient.V2
@@ -24,7 +25,7 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
 
             services.AddNacosV2Naming(configuration, sectionName: section);
 
-            services.AddSingleton<RegSvcBgTask>();
+            services.AddHostedService<RegSvcBgTask>();
 
             return services;
         }
@@ -45,18 +46,17 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
 
             services.AddNacosV2Naming(options.BuildSdkOptions());
 
-            services.AddSingleton<RegSvcBgTask>();
+            services.AddHostedService<RegSvcBgTask>();
 
             return services;
         }
 
-
-        public static async Task<IApplicationBuilder> UseNacosAspNet(this IApplicationBuilder app, IHostApplicationLifetime lifetime)
+        public static async Task<IApplicationBuilder> UseNacosAspNet(this IApplicationBuilder app, IHostApplicationLifetime lifetime, CancellationToken cancellationToken)
         {
             RegSvcBgTask regSvcBgTask = app.ApplicationServices.GetRequiredService<RegSvcBgTask>();
-            await regSvcBgTask.StartAsync();
+            await regSvcBgTask.StartAsync(cancellationToken);
             lifetime.ApplicationStopping.Register(async () => {
-                await regSvcBgTask.StopAsync();
+                await regSvcBgTask.StopAsync(cancellationToken);
             });
             return app;
         }
