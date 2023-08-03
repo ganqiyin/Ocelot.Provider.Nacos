@@ -8,19 +8,20 @@ using Xunit;
 
 namespace Ocelot.Provider.Nacos.Test
 {
-    public class NacosClientTest
+    public class NacosClientTest : IClassFixture<NacosFixture>
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        public NacosClientTest(NacosFixture fixture)
+        {
+            _serviceProvider = fixture._Host.Services.GetRequiredService<IServiceProvider>();
+        }
+
         [Fact]
         public async void TestClient()
-        {
-            IServiceCollection services = new ServiceCollection();
-            IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
-            services.AddNacosAspNet(configurationBuilder.Build());
-
-            var provider = services.BuildServiceProvider();
-            RegSvcBgTask regSvcBgTask = provider.GetRequiredService<RegSvcBgTask>();
-            await regSvcBgTask.StartAsync();
+        { 
+            RegSvcBgTask regSvcBgTask = _serviceProvider.GetRequiredService<RegSvcBgTask>();
+            await regSvcBgTask.StartAsync(default);
             Console.ReadLine();
         }
     }
