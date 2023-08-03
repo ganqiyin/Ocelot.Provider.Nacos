@@ -1,9 +1,6 @@
-using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Ocelot.Provider.Nacos.NacosClient;
 using Ocelot.Provider.Nacos.NacosClient.V2;
+using System;
 using Xunit;
 
 namespace Ocelot.Provider.Nacos.Test
