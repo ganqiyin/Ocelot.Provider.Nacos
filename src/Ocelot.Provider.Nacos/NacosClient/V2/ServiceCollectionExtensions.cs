@@ -25,7 +25,7 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
 
             services.AddNacosV2Naming(configuration, sectionName: section);
 
-            services.AddHostedService<RegSvcBgTask>();
+            services.AddSingleton<RegSvcBgTask>();
 
             return services;
         }
@@ -46,7 +46,7 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
 
             services.AddNacosV2Naming(options.BuildSdkOptions());
 
-            services.AddHostedService<RegSvcBgTask>();
+            services.AddSingleton<RegSvcBgTask>();
 
             return services;
         }
@@ -55,7 +55,8 @@ namespace Ocelot.Provider.Nacos.NacosClient.V2
         {
             RegSvcBgTask regSvcBgTask = app.ApplicationServices.GetRequiredService<RegSvcBgTask>();
             await regSvcBgTask.StartAsync(cancellationToken);
-            lifetime.ApplicationStopping.Register(async () => {
+            lifetime.ApplicationStopping.Register(async () =>
+            {
                 await regSvcBgTask.StopAsync(cancellationToken);
             });
             return app;
